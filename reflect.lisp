@@ -1,3 +1,27 @@
+(declaim (optimize (debug 3) (safety 3)))
+
+(defun to-string (arg) 
+  (format nil "~a" arg)
+  )
+
+(defun string-concat (strs) 
+  (if (= 1 (length strs))
+    (car strs)
+    (concatenate 'string (car strs) (string-concat (rest strs)))
+    )
+  )
+
+(defun symbol-concat (&rest args)
+  (let*
+    ((strs (mapcar #'to-string args))
+     (capstrs (mapcar #'string-upcase strs))
+     (str (string-concat capstrs))
+     )
+    (intern str)
+    ))
+
+
+
 (defmacro reflective-struct (name fields)
   (let* ((metadata-name (intern (string-upcase (concatenate 'string "+" (symbol-name name) "-metadata+"))))
          )
