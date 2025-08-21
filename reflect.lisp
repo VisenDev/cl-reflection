@@ -20,6 +20,15 @@
     (intern str)
     ))
 
+(defun generate-struct-pretty-print-fn (name fields)
+  (lambda (struct)
+    (concatenate
+     'string
+     (format nil "(make-~a" name)
+     (string-concat
+      (loop :for field in fields  
+            :collect (string-concat 
+
 
 
 (defmacro reflective-struct (name fields)
