@@ -20,14 +20,18 @@
     (intern str)
     ))
 
-(defun generate-struct-pretty-print-fn (name fields)
-  (lambda (struct)
-    (concatenate
-     'string
-     (format nil "(make-~a" name)
-     (string-concat
-      (loop :for field in fields  
-            :collect (string-concat 
+(defun tostring-concat (&rest args)
+  (string-downcase (format nil "~{~a~}" args))
+  )
+
+;(defun generate-struct-pretty-print-fn (name fields)
+;  (lambda (struct)
+;    (concatenate
+;     'string
+;     (format nil "(make-~a" name)
+;     (string-concat
+;      (loop :for field in fields  
+;            :collect (tostring-concat ":" field  
 
 
 
