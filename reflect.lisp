@@ -35,6 +35,8 @@
 
 
 
+
+
 (defmacro reflective-struct (name fields)
   (let* ((metadata-name (intern (string-upcase (concatenate 'string "+" (symbol-name name) "-metadata+"))))
          )
@@ -57,6 +59,65 @@
 (reflective-struct
   foo
   (bar bip bapp))
+
+(defstruct foo
+  bar bip bapp)
+
+(defun generate-serialize-format-string (fields)
+  (print fields)
+  (format nil "{~{~a~}}"
+          (loop
+            :with prepend-comma = nil
+            :for field in fields
+            :for str = (string-downcase (symbol-name (print field)))
+            :collect (if prepend-comma
+                       (format nil ", ~s: ~~a" str)
+                       (format nil "~s: ~~a" str))
+            :do (setq prepend-comma t)
+          )
+  ))
+
+(defun generate-serialize-accessor-forms (name fields)
+  (loop
+    :for field in fields
+    :collect (list (symbol-concat name '- field) 'obj)
+    )
+  )
+
+(defmacro def-serializer (name fields)
+  `(defun ,(symbol-concat 'serialize- name) (obj)
+     (format
+      nil
+      ,(generate-serialize-format-string fields)
+      ,@(generate-serialize-accessor-forms name fields)
+      )))
+
+(defun make-serializer (name fields)
+  (eval
+   `(defun ,(symbol-concat 'serialize- name) (obj)
+      (format
+       nil
+       ,(generate-serialize-format-string fields)
+       ,@(generate-serialize-accessor-forms name fields)
+       ))
+   )))
+
+
+
+
+
+
+      
+      
+
+(defun serialize-foo (foo)
+  (format
+   nil 
+   "(make-foo :bar ~a :bip ~a :bapp ~a)"
+   (foo-bar foo) (foo-bip foo) (foo-bapp foo)
+   )
+  )
+
 
 (defun serialize-reflective-struct (metadata value) 
   (format t "(make-foo")
